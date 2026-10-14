@@ -1,0 +1,54 @@
+import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
+import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
+import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import com.kms.katalon.core.checkpoint.Checkpoint as Checkpoint
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
+import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
+import com.kms.katalon.core.model.FailureHandling as FailureHandling
+import com.kms.katalon.core.testcase.TestCase as TestCase
+import com.kms.katalon.core.testdata.TestData as TestData
+import com.kms.katalon.core.testng.keyword.TestNGBuiltinKeywords as TestNGKW
+import com.kms.katalon.core.testobject.TestObject as TestObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import internal.GlobalVariable as GlobalVariable
+import org.openqa.selenium.Keys as Keys
+import com.kms.katalon.core.testobject.impl.HttpTextBodyContent
+
+
+def createObj = findTestObject('Object Repository/Create Pet')
+String jsonBody = '{"id": ' + GlobalVariable.petId + ', "category": {"id": 1, "name": "Dogs"}, "name": "' + GlobalVariable.petName + '", "photoUrls": ["string"], "tags": [{"id": 1, "name": "friendly"}], "status": "available"}'
+
+createObj.setBodyContent(new HttpTextBodyContent(jsonBody, 'UTF-8', 'application/json'))
+def createResponse = WS.sendRequest(createObj)
+WS.verifyResponseStatusCode(createResponse, 200)
+
+
+
+def getObj = findTestObject('Object Repository/Ambil Data Pet')
+def getResponse = WS.sendRequest(getObj)
+
+WS.verifyResponseStatusCode(getResponse, 200)
+WS.verifyElementPropertyValue(getResponse, 'id', GlobalVariable.petId)
+WS.verifyElementPropertyValue(getResponse, 'name', GlobalVariable.petName)
+
+
+
+def updateObj = findTestObject('Object Repository/Update Pet')
+String updateBody = '{"id": ' + GlobalVariable.petId + ', "category": {"id": 1, "name": "Dogs"}, "name": "' + GlobalVariable.updatePetName + '", "photoUrls": ["string"], "tags": [{"id": 1, "name": "friendly"}], "status": "sold"}'
+
+updateObj.setBodyContent(new HttpTextBodyContent(updateBody, 'UTF-8', 'application/json'))
+def updateResponse = WS.sendRequest(updateObj)
+
+WS.verifyResponseStatusCode(updateResponse, 200)
+WS.verifyElementPropertyValue(updateResponse, 'name', GlobalVariable.updatePetName)
+
+
+
+def deleteObj = findTestObject('Object Repository/Hapus Data Pet')
+def deleteResponse = WS.sendRequest(deleteObj)
+
+WS.verifyResponseStatusCode(deleteResponse, 200)  

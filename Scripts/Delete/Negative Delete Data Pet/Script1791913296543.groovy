@@ -1,0 +1,44 @@
+import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
+import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
+import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import com.kms.katalon.core.checkpoint.Checkpoint as Checkpoint
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
+import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
+import com.kms.katalon.core.model.FailureHandling as FailureHandling
+import com.kms.katalon.core.testcase.TestCase as TestCase
+import com.kms.katalon.core.testdata.TestData as TestData
+import com.kms.katalon.core.testng.keyword.TestNGBuiltinKeywords as TestNGKW
+import com.kms.katalon.core.testobject.TestObject as TestObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import internal.GlobalVariable as GlobalVariable
+import org.openqa.selenium.Keys as Keys
+import com.kms.katalon.core.testobject.impl.HttpTextBodyContent
+
+
+def createObj = findTestObject('Object Repository/Create Pet')
+String jsonBody = '''{
+  "id": 99999,
+  "category": { "id": 1, "name": "Dogs" },
+  "name": "Helly",
+  "photoUrls": ["string"],
+  "tags": [{ "id": 1, "name": "friendly" }],
+  "status": "available"
+}'''
+createObj.setBodyContent(new HttpTextBodyContent(jsonBody, 'UTF-8', 'application/json'))
+def createResponse = WS.sendRequest(createObj)
+
+WS.verifyResponseStatusCode(createResponse, 200)
+
+
+//Ambbil data pet by ID yang salah
+def getObj = findTestObject('Object Repository/Hapus Data Pet')
+
+getObj.setRestUrl('https://petstore.swagger.io/v2/pet/99999999')
+
+def getResponse = WS.sendRequest(getObj)
+
+WS.verifyResponseStatusCode(getResponse, 404)
